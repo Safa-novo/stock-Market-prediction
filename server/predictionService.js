@@ -28,9 +28,13 @@ export async function buildObservedPriceSeries(symbolInput) {
   const startPrice = await getStockPrice(symbol);
   const points = [];
 
+  const seed = [...symbol].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
   for (let day = 1; day <= 60; day += 1) {
     const intentionallyMissing =
-      day > 5 && day < 58 && (day % 11 === 0 || day % 17 === 0);
+      day > 5 &&
+      day < 58 &&
+      ((day + seed) % 13 === 0 || (day + seed) % 19 === 0);
 
     if (!intentionallyMissing) {
       points.push({
@@ -165,8 +169,8 @@ export async function predictTrend(symbolInput) {
   const recent = series.slice(-10);
   const first = recent[0].price;
   const last = recent.at(-1).price;
-  const momentum = ((last - first) / first) * 100;
-  const volatility = calculateVolatility(recent);
+  const momentum = ((last - first) / first) * 100; //momentum
+  const volatility = calculateVolatility(recent); //valusity
   const latestShortAverage = series.at(-1).movingAverage5;
   const latestLongAverage = series.at(-1).movingAverage10;
   const averageSpread =
